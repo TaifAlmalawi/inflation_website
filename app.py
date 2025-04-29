@@ -12,25 +12,28 @@ st.markdown("""
     - bullet points
 """)
 
-n_steps = st.text_input('Insert a number of steps:')
+n_steps = st.text_input('Insert a number of steps:', 0)
 
 st.write('The current number of steps is ', int(n_steps))
 
 model_forecast = load_pickle("fao_model.pkl")
 
 if st.button('Predict the future: 🔮'):
-    forecast = model_forecast.forecast(steps=int(n_steps))
 
-    y_train = pd.read_csv('y_train.csv')
-    last_date = y_train.index[-1]
-    last_date = pd.to_datetime(last_date)
 
-    future_dates = pd.date_range(start=last_date + pd.offsets.MonthBegin(), periods=int(n_steps), freq='MS')
+    if int(n_steps) > 0:
+        forecast = model_forecast.forecast(steps=int(n_steps))
+        y_train = pd.read_csv('y_train.csv')
+        last_date = y_train.index[-1]
+        last_date = pd.to_datetime(last_date)
 
-    forecast_df = pd.DataFrame({
-        'date': future_dates,
-        'predicted_value': forecast
-    })
+        future_dates = pd.date_range(start=last_date + pd.offsets.MonthBegin(), periods=int(n_steps), freq='MS')
 
-    st.table(forecast_df)
+        forecast_df = pd.DataFrame({
+            'date': future_dates,
+            'predicted_value': forecast
+        })
 
+        st.table(forecast_df)
+    else:
+        st.write('Im sorry...')
