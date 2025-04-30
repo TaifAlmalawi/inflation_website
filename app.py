@@ -2,38 +2,48 @@ import streamlit as st
 import pandas as pd
 from statsmodels.iolib.smpickle import load_pickle
 import matplotlib.pyplot as plt
+import numpy as np
 
-st.markdown("""
-    # Inflation Prediction
+st.sidebar.markdown("""
+# 📈 Inflation Forecast App
 
-    ## many levels of subtitles
+🌾 About FAO Data
 
-    **bold** or *italic* text with [links](http://github.com/streamlit) and:
-    - bullet points
+This forecast specific to Saudi Arabia is based on food price data collected by the Food and Agriculture Organization (FAO), which monitors global food markets and trends.
 """)
 
-n_steps = st.text_input('Insert a number of steps:', 0)
+# Input section
+n_steps = st.sidebar.text_input('How many months do you want to predict?🤔', 0)
+st.write('The current number of months is ', int(n_steps))
 
-st.write('The current number of steps is ', int(n_steps))
-
+# Load model
 model_forecast = load_pickle("fao_model.pkl")
 
-if st.button('Predict the future: 🔮'):
-
+# Forecast section
+if st.sidebar.button('Predict the future: 🔮'):
 
     if int(n_steps) > 0:
         forecast = model_forecast.forecast(steps=int(n_steps))
-        y_train = pd.read_csv('y_train.csv')
-        last_date = y_train.index[-1]
-        last_date = pd.to_datetime(last_date)
 
+        y_train = pd.read_csv('y_train.csv', index_col=0)
+        y_train.index = pd.to_datetime(y_train.index)
+
+        last_date = y_train.index[-1]
         future_dates = pd.date_range(start=last_date + pd.offsets.MonthBegin(), periods=int(n_steps), freq='MS')
 
+        forecast_values = forecast if not isinstance(forecast, np.ndarray) else forecast.tolist()
+
         forecast_df = pd.DataFrame({
-            'date': future_dates,
-            'predicted_value': forecast
-        })
+            'predicted_value': forecast_values
+        }, index=future_dates)
+        forecast_df.index.name = 'date'
 
         st.table(forecast_df)
+        st.line_chart(forecast_df)
+
+        # Show instruction under the button
+        st.markdown('Click the **"Predict the future 🔮"** button again to update the forecast.')
     else:
-        st.write('Im sorry...')
+        st.write('I\'m sorry... Please enter a valid number of steps.')
+
+st.sidebar.markdown('Click the **"Predict the future 🔮"** button to see the forecast')
