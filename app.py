@@ -47,3 +47,14 @@ if st.sidebar.button('Predict the future: 🔮'):
         st.write('I\'m sorry... Please enter a valid number of steps.')
 
 st.sidebar.markdown('Click the **"Predict the future 🔮"** button to see the forecast')
+
+# === New Section: CPI Forecast Visualization ===
+st.markdown("---")
+st.header("📊 CPI Forecast Visualization")
+
+st.markdown("""
+This section provides a visualization of CPI (Consumer Price Index) forecasts.
+The images below show expected trends in consumer prices in Saudi Arabia based on historical CPI data.
+""")
+
+st.image("cpi.png", caption="CPI Forecast Trend - Model A")
